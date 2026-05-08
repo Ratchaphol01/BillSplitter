@@ -1,18 +1,23 @@
 {
-  "name": "final",
+  "name": "bill-splitter",
   "version": "1.0.0",
+  "description": "A bill-splitting web app built with Express, EJS, and MongoDB.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "connect-flash": "^0.1.1",
+    "dotenv": "^16.3.1",
     "ejs": "^5.0.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",

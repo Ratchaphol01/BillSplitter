@@ -15,7 +15,7 @@ router.get('/dashboard', isLoggedIn, expenseController.getDashboard);
 router.post('/group/create', isLoggedIn, expenseController.createGroup);
 router.get('/group/:groupId', isLoggedIn, expenseController.getGroupDetails);
 router.post('/add', isLoggedIn, expenseController.addExpense);
-router.delete('/:expenseId', isLoggedIn, expenseController.deleteExpense);
 router.delete('/group/:groupId', isLoggedIn, expenseController.deleteGroup);
+router.delete('/:expenseId', isLoggedIn, expenseController.deleteExpense);
 
 module.exports = router;
