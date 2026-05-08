@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= group.name %> - Bill Splitter</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="group-details-page">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">💰 Bill Splitter</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/expense/dashboard">กลับไปแดชบอร์ด</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/logout">ออกจากระบบ</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <div class="row mb-4">
+      <div class="col">
+        <h1><%= group.name %></h1>
+        <p class="text-muted"><%= group.description || '' %></p>
+      </div>
+      <div class="col text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+          + เพิ่มค่าใช้จ่าย
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Settlements Section -->
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">📊 สรุปค่าใช้จ่าย</h5>
+          </div>
+          <div class="card-body">
+            <% if (settlements && settlements.length > 0) { %>
+              <div class="list-group">
+                <% settlements.forEach(settlement => { %>
+                  <div class="list-group-item">
+                    <strong><%= settlement.from %></strong> ต้องจ่าย 
+                    <strong><%= settlement.to %></strong>
+                    <span class="badge bg-primary float-end"><%= settlement.amount.toFixed(2) %> บาท</span>
+                  </div>
+                <% }); %>
+              </div>
+            <% } else { %>
+              <p class="text-muted">ยังไม่มีค่าใช้จ่าย</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenses Section -->
+      <div class="col-lg-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">💳 รายการค่าใช้จ่าย</h5>
+          </div>
+          <div class="card-body">
+            <% if (expenses && expenses.length > 0) { %>
+              <div class="list-group">
+                <% expenses.forEach(expense => { %>
+                  <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                      <p class="mb-1"><strong><%= expense.description %></strong></p>
+                      <small class="text-muted"><%= expense.paidBy.name %> จ่ายแล้ว</small>
+                    </div>
+                    <div class="text-end">
+                      <p class="mb-1 fw-bold"><%= expense.amount.toFixed(2) %> บาท</p>
+                      <button class="btn btn-sm btn-danger" onclick="deleteExpense('<%= expense._id %>', '<%= group._id %>')">ลบ</button>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            <% } else { %>
+              <p class="text-muted">ยังไม่มีค่าใช้จ่าย</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Members Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-warning">
+            <h5 class="mb-0">👥 สมาชิกกลุ่ม</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <% group.members.forEach(member => { %>
+                <div class="col-md-3 mb-2">
+                  <div class="badge bg-light text-dark p-2">
+                    <%= member.name %>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div class="modal fade" id="addExpenseModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">เพิ่มค่าใช้จ่าย</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="addExpenseForm">
+          <input type="hidden" id="groupId" value="<%= group._id %>">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="description" class="form-label">รายละเอียด</label>
+              <input type="text" class="form-control" id="description" name="description" placeholder="เช่น อาหาร, ที่พัก" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="amount" class="form-label">ยอดรวม (บาท)</label>
+              <input type="number" class="form-control" id="amount" name="amount" placeholder="0.00" step="0.01" min="0" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="paidBy" class="form-label">จ่ายโดย</label>
+              <select class="form-select" id="paidBy" name="paidBy" required>
+                <option value="">-- เลือก --</option>
+                <% group.members.forEach(member => { %>
+                  <option value="<%= member.name %>"><%= member.name %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">หารให้กับ</label>
+              <div class="members-checkbox">
+                <% group.members.forEach(member => { %>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="member_<%= member.name %>" value="<%= member.name %>" name="splitAmong">
+                    <label class="form-check-label" for="member_<%= member.name %>">
+                      <%= member.name %>
+                    </label>
+                  </div>
+                <% }); %>
+              </div>
+              <small class="text-muted">เลือกสมาชิกที่จะแบ่งค่าใช้จ่ายนี้</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary">เพิ่มค่าใช้จ่าย</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/darkmode.js"></script>
+  <script src="/js/groupDetails.js"></script>
+</body>
+</html>

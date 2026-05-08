@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลงทะเบียน - Bill Splitter</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="auth-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="auth-card">
+          <h1 class="mb-4 text-center">💰 ลงทะเบียน</h1>
+
+          <% if (message) { %>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <%= message %>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          <% } %>
+
+          <form id="registerForm" class="form-auth">
+            <div class="mb-3">
+              <label for="name" class="form-label">ชื่อ</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="กรอกชื่อของคุณ" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">อีเมล</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="กรอกอีเมลของคุณ" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">รหัสผ่าน</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="กรอกรหัสผ่าน" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="passwordConfirm" class="form-label">ยืนยันรหัสผ่าน</label>
+              <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" placeholder="ยืนยันรหัสผ่าน" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">ลงทะเบียน</button>
+          </form>
+
+          <p class="mt-3 text-center">มีบัญชีแล้ว? <a href="/login">เข้าสู่ระบบที่นี่</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center py-5">
+          <div style="font-size: 3rem; margin-bottom: 20px;">✅</div>
+          <h4 class="mb-3">ลงทะเบียนสำเร็จ!</h4>
+          <p class="text-muted">ยินดีต้อนรับเข้าสู่ Bill Splitter</p>
+        </div>
+        <div class="modal-footer justify-content-center border-0">
+          <a href="/login" class="btn btn-primary px-4">เข้าสู่ระบบ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/darkmode.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+      try {
+        const response = await fetch('/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password, passwordConfirm })
+        });
+
+        const data = await response.json();
+
+        if (response.ok || response.status === 201) {
+          // Show success modal
+          const modal = new bootstrap.Modal(document.getElementById('successModal'));
+          modal.show();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('เกิดข้อผิดพลาด');
+      }
+    });
+  </script>
+</body>
+</html>

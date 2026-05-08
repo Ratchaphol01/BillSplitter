@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ด - Bill Splitter</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-page">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">💰 Bill Splitter</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/logout">ออกจากระบบ</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <div class="row mb-4">
+      <div class="col">
+        <h1>แดชบอร์ด</h1>
+      </div>
+      <div class="col text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+          + สร้างกลุ่มใหม่
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <% if (groups && groups.length > 0) { %>
+        <% groups.forEach(group => { %>
+          <div class="col-md-4 mb-4">
+            <div class="card group-card">
+              <div class="card-body">
+                <h5 class="card-title"><%= group.name %></h5>
+                <p class="card-text text-muted"><%= group.description || 'ไม่มีคำอธิบาย' %></p>
+                <div class="group-info mb-3">
+                  <small>สมาชิก: <%= group.members.length %></small>
+                </div>
+                <a href="/expense/group/<%= group._id %>" class="btn btn-sm btn-primary">ดูรายละเอียด</a>
+                <button class="btn btn-sm btn-danger" onclick="deleteGroup('<%= group._id %>')">ลบ</button>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="col-12">
+          <div class="alert alert-info">
+            ยังไม่มีกลุ่ม สร้างกลุ่มใหม่เพื่อเริ่มแชร์ค่าใช้จ่าย
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Create Group Modal -->
+  <div class="modal fade" id="createGroupModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">สร้างกลุ่มใหม่</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="createGroupForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="groupName" class="form-label">ชื่อกลุ่ม</label>
+              <input type="text" class="form-control" id="groupName" name="groupName" placeholder="เช่น การเดินทาง, วันเกิด" required>
+            </div>
+            <div class="mb-3">
+              <label for="groupDescription" class="form-label">คำอธิบาย</label>
+              <textarea class="form-control" id="groupDescription" name="groupDescription" rows="3" placeholder="คำอธิบายกลุ่ม (ไม่บังคับ)"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="memberInput" class="form-label">เพิ่มสมาชิก</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="memberInput" placeholder="กรอกชื่อเพื่อน">
+                <button class="btn btn-outline-primary" type="button" id="addMemberBtn">เพิ่ม</button>
+              </div>
+              <div id="membersList" class="mt-2"></div>
+              <input type="hidden" id="membersArray" name="members">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="submit" class="btn btn-primary">สร้างกลุ่ม</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/darkmode.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
